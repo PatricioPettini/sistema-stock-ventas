@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: productos-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/productos-service?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: ""           # si realmente es vacío
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # opcional:
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    # puedes omitir database-platform (autodetecta), o usar:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Opción A (la que ya usas):
+          jwk-set-uri: http://localhost:8181/realms/microservicios-realm/protocol/openid-connect/certs
+          # Opción B (en vez de la anterior):
+          # issuer-uri: http://localhost:8181/realms/microservicios-realm
+
+      client:
+        registration:
+          keycloak:
+            client-id: microservicios-client          # <-- el ID de tu cliente en Keycloak
+            client-secret: 4T8x8YNNHGOBKeG4Su645BEUWWttEOb0
+            scope: openid,profile,email
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8181/realms/microservicios-realm
+
+keycloak:
+  server-url: http://localhost:8181         # o 8080 si ese es tu KC
+  realm: microservicios-realm
+  admin:
+    client-id: microservicios-client        # <-- debe ser un client CONFIDENTIAL con Service Accounts = ON
+    client-secret: 4T8x8YNNHGOBKeG4Su645BEUWWttEOb0          # <-- secret de ese client
+  legacy-auth-path: false                   # true solo si tu KC usa /auth (Keycloak viejo)
+
+
+server:
+  port: 8081
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:password@localhost:8761/eureka
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    instance-id: ${spring.application.name}:${server.port}
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /productos-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /productos-service/swagger-ui.html
+    config-url: /productos-service/v3/api-docs/swagger-config

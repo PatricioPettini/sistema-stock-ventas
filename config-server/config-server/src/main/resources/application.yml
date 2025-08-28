@@ -1,0 +1,14 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Pato15-7/config-server-sistema-carrito.git
+          searchPaths: OneDrive/Escritorio/RepositorioSistemaCarrito/config-data
+          username: ${GIT_USER}
+          password: ${GIT_PASSWORD}
