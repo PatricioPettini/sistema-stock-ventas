@@ -1,5 +1,6 @@
 package com.patomicroservicios.productos_service.service.interfaces;
 
+import com.patomicroservicios.productos_service.dto.request.ProductCreateDTO;
 import com.patomicroservicios.productos_service.dto.request.ProductPatchDTO;
 import com.patomicroservicios.productos_service.dto.request.ProductoUpdateDTO;
 import com.patomicroservicios.productos_service.dto.response.ProductoDTO;
@@ -8,7 +9,7 @@ import com.patomicroservicios.productos_service.model.Producto;
 import java.util.List;
 
 public interface IProductoService {
-    ProductoDTO altaProducto(Producto producto);
+    ProductoDTO altaProducto(ProductCreateDTO producto);
     void eliminarProducto(Long codigoProducto);
     ProductoDTO editarProducto(ProductoUpdateDTO producto, Long codigoProducto);
     List<ProductoDTO> getAllDto();

@@ -46,7 +46,7 @@ keycloak:
   legacy-auth-path: false                   # true solo si tu KC usa /auth (Keycloak viejo)
 
 server:
-  port: 8085
+  port: 8086
 
 eureka:
   client:

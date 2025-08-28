@@ -3,6 +3,7 @@ package com.patomicroservicios.productos_service.service.implementations;
 import com.patomicroservicios.productos_service.Exceptions.ProductoActivoException;
 import com.patomicroservicios.productos_service.Exceptions.ProductoInactivoException;
 import com.patomicroservicios.productos_service.Exceptions.ProductoNoEncontradoException;
+import com.patomicroservicios.productos_service.dto.request.ProductCreateDTO;
 import com.patomicroservicios.productos_service.dto.request.ProductPatchDTO;
 import com.patomicroservicios.productos_service.dto.request.ProductoUpdateDTO;
 import com.patomicroservicios.productos_service.dto.response.MarcaDTO;
@@ -44,14 +45,18 @@ public class ProductoService implements IProductoService {
 
     //dar de alta un nuevo producto
     @Override
-    public ProductoDTO altaProducto(Producto producto) {
-        ProductoDTO dto = modelMapper.map(producto,ProductoDTO.class);
-        if(producto.getIdMarca()!=null){
-            Marca mar=marcaService.getMarca(producto.getIdMarca());
-            dto.setMarca(modelMapper.map(mar,MarcaDTO.class));
+    public ProductoDTO altaProducto(ProductCreateDTO producto) {
+        Producto prod=modelMapper.map(producto,Producto.class);
+        Long idMarca=producto.getIdMarca();
+        if(idMarca!=null && marcaService.getMarca(idMarca)!=null){
+            prod.setMarca(marcaService.getMarca(idMarca));
         }
-        productoRepository.save(producto);
-        return dto;
+        Long idTipoProducto=producto.getIdTipoProducto();
+        if(idTipoProducto!=null && tipoProductoService.getTipoProducto(idTipoProducto)!=null){
+            prod.setTipoProducto(tipoProductoService.getTipoProducto(idTipoProducto));
+        }
+        Producto guardado=productoRepository.save(prod);
+        return modelMapper.map(guardado,ProductoDTO.class);
     }
 
     @Override
@@ -72,26 +77,18 @@ public class ProductoService implements IProductoService {
 
         Long idMarca=producto.getIdMarca();
         if (idMarca != null) {
-            product.setIdMarca(idMarca);
+            Marca mar=marcaService.getMarca(idMarca);
+            product.setMarca(mar);
         }
         Long idTipoProducto = producto.getIdTipoProducto();
         if (idTipoProducto != null) {
-            product.setIdTipoProducto(idTipoProducto);
+            TipoProducto tipoProducto=tipoProductoService.getTipoProducto(idTipoProducto);
+            product.setTipoProducto(tipoProducto);
         }
 
         productoRepository.save(product);
 
-        ProductoDTO dto = modelMapper.map(producto,ProductoDTO.class);
-        if (producto.getIdMarca() != null) {
-            MarcaDTO marcaDto = marcaService.getMarcaDTO(producto.getIdMarca());
-            if (marcaDto != null) dto.setMarca(marcaDto);
-        }
-        if (producto.getIdTipoProducto() != null) {
-            TipoProductoDTO tipoDto = tipoProductoService.getTipoProductoDTO(producto.getIdTipoProducto());
-            if (tipoDto != null) dto.setTipo(tipoDto);
-        }
-
-        return dto;
+        return modelMapper.map(producto,ProductoDTO.class);
     }
 
 //    @Override
@@ -118,22 +115,7 @@ public class ProductoService implements IProductoService {
         return productoRepository.findById(codigoProducto).map(
                 producto -> {
                     ProductoDTO dto = modelMapper.map(producto, ProductoDTO.class);
-                    Long idMarca = producto.getIdMarca();
-                    if (idMarca != null) {
-                        Marca mar = marcaService.getMarca(producto.getIdMarca());
-                        if (mar != null) {
-                            dto.setMarca(modelMapper.map(mar, MarcaDTO.class));
-                        }
-                    }
-                    Long idTipoProducto = producto.getIdTipoProducto();
-                    if (idTipoProducto != null) {
-                        TipoProducto tipo = tipoProductoService.getTipoProducto(producto.getIdTipoProducto());
-                        if (tipo != null) {
-                            dto.setTipo(modelMapper.map(tipo, TipoProductoDTO.class));
-                        }
-                    }
                     return dto;
-
                 }
         ).orElseThrow(ProductoNoEncontradoException::new);
     }
@@ -150,8 +132,14 @@ public class ProductoService implements IProductoService {
             }
             product.setPrecioIndividual(precio);
         }
-        if(producto.getIdMarca()!=null) product.setIdMarca(producto.getIdMarca());
-        if(producto.getIdTipoProducto()!=null) product.setIdTipoProducto(producto.getIdTipoProducto());
+        if(producto.getIdMarca()!=null){
+            Marca mar=marcaService.getMarca(producto.getIdMarca());
+            product.setMarca(mar);
+        }
+        if(producto.getIdTipoProducto()!=null){
+            TipoProducto tipo=tipoProductoService.getTipoProducto(producto.getIdTipoProducto());
+            product.setTipoProducto(tipo);
+        }
         if(producto.getEstado()!=null) product.setEstado(producto.getEstado());
         Producto prod = productoRepository.save(product);
         return modelMapper.map(prod,ProductoDTO.class);
@@ -201,15 +189,15 @@ public class ProductoService implements IProductoService {
         return producto;
     }
 
-    public ProductoDTO fallbackProductoNoEncontrado(Long codigoProducto, Throwable throwable) {
-        System.out.println("⚠️ Fallback activado por excepción: " + throwable.getMessage());
-
-        ProductoDTO productoFallback = new ProductoDTO();
-        productoFallback.setCodigo(codigoProducto);
-        productoFallback.setNombre("Producto no disponible");
-        productoFallback.setEstado(false); // o como manejes el estado
-
-        return productoFallback;
-    }
+//    public ProductoDTO fallbackProductoNoEncontrado(Long codigoProducto, Throwable throwable) {
+//        System.out.println("⚠️ Fallback activado por excepción: " + throwable.getMessage());
+//
+//        ProductoDTO productoFallback = new ProductoDTO();
+//        productoFallback.setCodigo(codigoProducto);
+//        productoFallback.setNombre("Producto no disponible");
+//        productoFallback.setEstado(false); // o como manejes el estado
+//
+//        return productoFallback;
+//    }
 
 }

@@ -15,5 +15,5 @@ public class ProductoDTO {
     private MarcaDTO marca;
     private TipoProductoDTO tipo;
     private double precioIndividual;
-    private String estado;
+    private Boolean estado;
 }

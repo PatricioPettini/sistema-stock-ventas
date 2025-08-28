@@ -1,6 +1,8 @@
 package com.patomicroservicios.user_service.service;
 
 import com.patomicroservicios.user_service.dto.request.RegisterUserRequest;
+import com.patomicroservicios.user_service.repository.carritoAPI;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +26,9 @@ public class KeycloakAdminService {
     private final String clientId;
     private final String clientSecret;
     private final boolean legacyAuthPath;
+
+    @Autowired
+    carritoAPI carritoAPI;
 
     public KeycloakAdminService(
             WebClient keycloakWebClient,
@@ -119,8 +124,8 @@ public class KeycloakAdminService {
             }
 
             // 4) (Opcional) Asignar un rol de realm (ej: "user")
-            // assignRealmRole(token, userId, "user");
-
+            assignRealmRole(token, userId, "user");
+            carritoAPI.enviaridUser(userId);
             return userId;
 
         } catch (WebClientResponseException e) {

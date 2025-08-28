@@ -1,7 +1,9 @@
 package com.patomicroservicios.productos_service.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.patomicroservicios.productos_service.Exceptions.ProductoActivoException;
 import com.patomicroservicios.productos_service.Exceptions.ProductoInactivoException;
+import com.patomicroservicios.productos_service.dto.response.TipoProductoDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,12 +22,14 @@ public class Producto {
     @NotNull(message = "No puede estar vacio")
     @Column(nullable = false)
     private String nombre;
-    @NotNull(message = "No puede estar vacio")
-    @Column(nullable = false)
-    private Long idMarca;
-    @NotNull(message = "No puede estar vacio")
-    @Column(nullable = false)
-    private Long idTipoProducto;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_marca", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_producto_marca"))
+    private Marca marca;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_tipoProducto", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_producto_tipo"))
+    private TipoProducto tipoProducto;
     @NotNull(message = "No puede estar vacio")
     @Column(nullable = false)
     private Double precioIndividual;

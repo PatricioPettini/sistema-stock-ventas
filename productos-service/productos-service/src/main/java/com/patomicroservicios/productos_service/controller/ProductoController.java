@@ -1,5 +1,6 @@
 package com.patomicroservicios.productos_service.controller;
 
+import com.patomicroservicios.productos_service.dto.request.ProductCreateDTO;
 import com.patomicroservicios.productos_service.dto.request.ProductFilterDTO;
 import com.patomicroservicios.productos_service.dto.request.ProductPatchDTO;
 import com.patomicroservicios.productos_service.dto.request.ProductoUpdateDTO;
@@ -94,9 +95,8 @@ public class ProductoController {
     )
     @PostMapping
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<String> addProduct(@Valid @RequestBody Producto producto) {
-        productoService.altaProducto(producto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Producto creado correctamente");
+    public ResponseEntity<ProductoDTO> addProduct(@Valid @RequestBody ProductCreateDTO producto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productoService.altaProducto(producto));
     }
     @Operation(
             summary="Editar Producto",

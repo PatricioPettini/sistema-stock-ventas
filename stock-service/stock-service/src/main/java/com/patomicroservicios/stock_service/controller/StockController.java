@@ -54,8 +54,8 @@ public class StockController {
             summary="Editar Stock de un Producto",
             description= "Este endpoint permite modificar la cantidad de stock de un producto"
     )
-    @PatchMapping("/patch")
-    public ResponseEntity<StockDTO> patchStock(@PathVariable Long productId, @RequestBody StockPatch stock) {
+    @PutMapping("/put")
+    public ResponseEntity<StockDTO> patchStock(@RequestBody StockPatch stock) {
             StockDTO nuevoStock=stockService.editStock(stock.getIdProducto(), stock.getCantidad());
             return ResponseEntity.ok(nuevoStock);
     }

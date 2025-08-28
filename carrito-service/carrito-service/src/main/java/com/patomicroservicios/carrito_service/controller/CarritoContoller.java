@@ -43,49 +43,45 @@ public class CarritoContoller {
             summary="Crear Carrito",
             description= "Este endpoint permite simular el alta de un carrito"
     )
-    @PostMapping()
-    public ResponseEntity<String> altaCarrito(){
-        carritoService.altaCarrito();
+    @PostMapping("/{idUser}")
+    public ResponseEntity<String> altaCarrito(@PathVariable String idUser){
+        carritoService.altaCarrito(idUser);
         return ResponseEntity.ok("Se creo el carrito correctamente!");
-    }
-
-    @Operation(
-            summary="Eliminar Carrito",
-            description= "Este endpoint permite eliminar un carrito en base a su id"
-    )
-    @DeleteMapping("/delete/{idCarrito}")
-    public ResponseEntity<String> eliminarCarrito(@PathVariable Long idCarrito){
-        carritoService.eliminarCarrito(idCarrito);
-        return ResponseEntity.ok("El carrito se elimino correctamente!");
     }
 
     @Operation(
             summary="Añadir Productos al Carrito",
             description= "Este endpoint permite agregar productos a un carrito"
     )
-    @PostMapping("/add/productos}")
-    public ResponseEntity<CarritoDTO> addProductosCarrito(@RequestBody CarritoProductsDTO dto){
-        CarritoDTO carritoDTO=carritoService.agregarProducto(dto.getIdCarrito(),dto.getIdProducto(), dto.getCantidad());
-        return ResponseEntity.ok(carritoDTO);
+    @PostMapping("/add/producto")
+    public ResponseEntity<Carrito> addProductosCarrito(@RequestBody CarritoProductsDTO dto){
+        Carrito carrito=carritoService.agregarProducto(dto.getIdCarrito(),dto.getIdProducto(), dto.getCantidad());
+        return ResponseEntity.ok(carrito);
     }
 
     @Operation(
             summary="Editar la cantidad de un producto en el Carrito",
             description= "Este endpoint permite obtener un carrito en base a su id"
     )
-    @PutMapping("/put/productos")
-    public ResponseEntity<CarritoDTO> editarCantidadProductoCarrito(@RequestBody CarritoProductsDTO dto){
-        CarritoDTO carritoDTO=carritoService.editarCantidadProducto(dto.getIdCarrito(), dto.getIdProducto(),dto.getCantidad());
-        return ResponseEntity.ok(carritoDTO);
+    @PutMapping("/put/producto")
+    public ResponseEntity<Carrito> editarCantidadProductoCarrito(@RequestBody CarritoProductsDTO dto){
+        Carrito carrito=carritoService.editarCantidadProducto(dto.getIdCarrito(), dto.getIdProducto(),dto.getCantidad());
+        return ResponseEntity.ok(carrito);
     }
 
     @Operation(
             summary="Eliminar Producto del Carrito",
             description= "Este endpoint permite eliminar un producto del carrito"
     )
-    @DeleteMapping("/delete/productos")
+    @DeleteMapping("/delete/producto")
     public ResponseEntity<String> deleteProductosCarritos(@RequestBody CarritoProductsDeleteDTO dto){
         carritoService.eliminarProducto(dto.getIdCarrito(),dto.getIdProducto());
         return ResponseEntity.ok("Se elimino el producto del carrito!!");
+    }
+
+    @PutMapping("/vaciar/{idCarrito}")
+    public ResponseEntity<String> vaciarCarrito(@PathVariable Long idCarrito){
+        carritoService.vaciarCarrito(idCarrito);
+        return ResponseEntity.ok("Se vacio el carrito!");
     }
 }

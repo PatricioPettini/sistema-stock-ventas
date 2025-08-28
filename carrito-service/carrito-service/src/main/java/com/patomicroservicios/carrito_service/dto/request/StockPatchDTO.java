@@ -1,4 +1,4 @@
-package com.patomicroservicios.stock_service.dto.request;
+package com.patomicroservicios.carrito_service.dto.request;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -11,9 +11,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StockCreateDTO {
-        @NotNull
-        private Long idProducto;
-        @NotNull @Min(0) private Integer cantidad;
-        @NotNull private String idUser;
+public class StockPatchDTO {
+    @NotNull
+    private Long idProducto;
+    @NotNull
+    @Min(value = 0, message = "La cantidad no puede ser negativa")
+    private int cantidad;
 }

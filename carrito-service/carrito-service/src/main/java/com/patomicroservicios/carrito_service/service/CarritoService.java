@@ -6,21 +6,28 @@ import com.patomicroservicios.carrito_service.Exceptions.ProductoNoEncontradoExc
 import com.patomicroservicios.carrito_service.Exceptions.StockException;
 import com.patomicroservicios.carrito_service.dto.CarritoDTO;
 import com.patomicroservicios.carrito_service.dto.ProductoDTO;
+import com.patomicroservicios.carrito_service.dto.request.StockPatchDTO;
 import com.patomicroservicios.carrito_service.dto.response.StockDTO;
 import com.patomicroservicios.carrito_service.model.Carrito;
 import com.patomicroservicios.carrito_service.model.ProductoCantidad;
 import com.patomicroservicios.carrito_service.repository.ICarritoRepository;
-import com.patomicroservicios.carrito_service.repository.ProductoAPI;
+import com.patomicroservicios.carrito_service.repository.productoAPI;
 import com.patomicroservicios.carrito_service.repository.stockAPI;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.BadRequestException;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
+@Slf4j
 @Service
 public class CarritoService implements ICarritoService{
 
@@ -28,7 +35,7 @@ public class CarritoService implements ICarritoService{
     ICarritoRepository carritoRepository;
 
     @Autowired
-    ProductoAPI productoAPI;
+    productoAPI productoAPI;
 
     @Autowired
     stockAPI stockAPI;
@@ -38,17 +45,18 @@ public class CarritoService implements ICarritoService{
 
     //agregar producto al carrito
     @Override
-    public CarritoDTO agregarProducto(Long idCarrito, Long idProducto, int cantidad) {
+    public Carrito agregarProducto(Long idCarrito, Long idProducto, int cantidad) {
         Carrito carrito = carritoRepository.findById(idCarrito).orElseThrow(CarritoNoEncontradoException::new);
         ProductoDTO productoDTO = productoAPI.getProducto(idProducto);
         if (productoDTO == null) throw new ProductoNoEncontradoException();
+        if(productoDTO.getEstado().equals(false)) throw new ProductoInactivoException();
+        if(cantidad<1) throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
         StockDTO stockDTO = validarStock(idProducto, cantidad);
         ProductoCantidad productoCantidad=new ProductoCantidad(idProducto, cantidad);
-        stockAPI.editStock(idProducto,stockDTO.getCantidad()-cantidad);
+        stockAPI.editStock(new StockPatchDTO(idProducto,stockDTO.getCantidad()-cantidad));
         carrito.getProductList().add(productoCantidad);
         carrito=actualizarSumaTotal(carrito);
-        carritoRepository.save(carrito);
-        return modelMapper.map(carrito,CarritoDTO.class);
+        return carritoRepository.save(carrito);
     }
 
     //validar stock disponible
@@ -56,7 +64,7 @@ public class CarritoService implements ICarritoService{
         StockDTO stockDTO=stockAPI.getCantidadStockPoducto(idProducto);
         if(cantidad >stockDTO.getCantidad()) throw new StockException();
         ProductoDTO productoDTO=productoAPI.getProducto(idProducto);
-        if(productoDTO.getEstado().equals("INACTIVO")) throw new ProductoInactivoException();
+        if(productoDTO.getEstado().equals(false)) throw new ProductoInactivoException();
         return stockDTO;
     }
 
@@ -93,7 +101,7 @@ public class CarritoService implements ICarritoService{
             StockDTO stockDTO = stockAPI.getCantidadStockPoducto(idProducto);
 
             // 🔁 3. Actualizar stock correctamente
-            stockAPI.editStock(idProducto, cantidad + stockDTO.getCantidad());
+            stockAPI.editStock(new StockPatchDTO(idProducto, cantidad + stockDTO.getCantidad()));
 
             carrito = actualizarSumaTotal(carrito);
             carritoRepository.save(carrito);
@@ -122,24 +130,32 @@ public class CarritoService implements ICarritoService{
 
     //crear nuevo carrito
     @Override
-    public void altaCarrito() {
+    public void altaCarrito(String idUser) {
         Carrito carrito= new Carrito();
+        carrito.setIdUser(idUser);
+        carrito.setTotalPrice(null);
         carritoRepository.save(carrito);
     }
 
-    //eliminar carrito
     @Override
-    public void eliminarCarrito(Long idCarrito) {
+    public void vaciarCarrito(Long idCarrito) {
         Carrito carrito=carritoRepository.findById(idCarrito).orElseThrow(CarritoNoEncontradoException::new);
-        carritoRepository.deleteById(idCarrito);
+        for(ProductoCantidad pc : carrito.getProductList()){
+            Long idProducto=pc.getIdProducto();
+            int cantidad=pc.getCantidad();
+            StockDTO dto=stockAPI.getCantidadStockPoducto(idProducto);
+            stockAPI.editStock(new StockPatchDTO(idProducto,dto.getCantidad()+cantidad));
+        }
+        carrito.setProductList(null);
+        carritoRepository.save(carrito);
     }
-
-    //editar la cantidad de un producto en el carrito
     @Override
-    public CarritoDTO editarCantidadProducto(Long idCarrito, Long idProducto, int cantidad) {
+    public Carrito editarCantidadProducto(Long idCarrito, Long idProducto, int cantidad) {
         Carrito carrito=carritoRepository.findById(idCarrito).orElseThrow(CarritoNoEncontradoException::new);
         ProductoDTO productoDTO=productoAPI.getProducto(idProducto);
-        if(productoDTO.getEstado().equals("INACTIVO")) throw new ProductoInactivoException();
+        if(productoDTO==null) throw new ProductoNoEncontradoException();
+        if(productoDTO.getEstado().equals(false)) throw new ProductoInactivoException();
+        if(cantidad<1) throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
         List<ProductoCantidad> productoCantidadList= new ArrayList<>();
         for(ProductoCantidad pc : carrito.getProductList()){
             if(pc.getIdProducto().equals(idProducto)){
@@ -152,13 +168,13 @@ public class CarritoService implements ICarritoService{
                         throw new StockException();
                     }
                 }
-                stockAPI.editStock(idProducto,stockDTO.getCantidad()+cantidadAnterior-cantidad);
+                stockAPI.editStock(new StockPatchDTO(idProducto,stockDTO.getCantidad()+cantidadAnterior-cantidad));
             }
             productoCantidadList.add(pc);
         }
         carrito.setProductList(productoCantidadList);
         actualizarSumaTotal(carrito);
-        carritoRepository.save(carrito);
-        return modelMapper.map(carrito,CarritoDTO.class);
+        return carritoRepository.save(carrito);
     }
+
 }

@@ -18,7 +18,7 @@
         </processorPath>
         <module name="productos-service" />
       </profile>
-      <profile name="Annotation profile for carrito-service" enabled="true">
+      <profile name="Annotation profile for user-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -26,13 +26,16 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
         </processorPath>
         <module name="stock-service" />
-        <module name="marca-service" />
-        <module name="ventas-service" />
-        <module name="tipoProducto" />
+        <module name="user-service" />
         <module name="eureka-server" />
         <module name="carrito-service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="marca-service" target="17" />
+      <module name="tipoProducto" target="17" />
+      <module name="ventas-service" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -44,6 +47,7 @@
       <module name="productos-service" options="-parameters" />
       <module name="stock-service" options="-parameters" />
       <module name="tipoProducto" options="-parameters" />
+      <module name="user-service" options="-parameters" />
       <module name="ventas-service" options="-parameters" />
     </option>
   </component>
