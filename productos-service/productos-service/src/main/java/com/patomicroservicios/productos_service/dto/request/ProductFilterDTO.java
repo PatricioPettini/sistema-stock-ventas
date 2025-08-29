@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class ProductFilterDTO {
     private Long idMarca;
-    private Long idTipoProducto;
+    private Long idCategoria;
     private Boolean estado;
 }

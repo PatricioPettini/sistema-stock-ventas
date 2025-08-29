@@ -36,7 +36,8 @@ public class StockService implements IStockService{
         stock= new Stock();
         stock.setIdProducto(st.getIdProducto());
         stock.setCantidad(st.getCantidad());
-        stock.setFechaActualizacion(LocalDate.now());
+//        stock.setFechaActualizacion(LocalDate.now());
+//        stock.setCreadoEn(LocalDate.now());
         Stock stockGuardado=stockRepository.save(stock);
         return modelMapper.map(stockGuardado,StockDTO.class);
     }
@@ -47,7 +48,7 @@ public class StockService implements IStockService{
         if (nuevaCantidad < 0) throw new IllegalArgumentException("Cantidad negativa");
         Stock stock=getStock(idProducto);
         stock.setCantidad(nuevaCantidad);
-        stock.setFechaActualizacion(LocalDate.now());
+//        stock.setFechaActualizacion(LocalDate.now());
         return modelMapper.map(stockRepository.save(stock),StockDTO.class);
     }
 
@@ -55,9 +56,9 @@ public class StockService implements IStockService{
     @Override
     public Stock getStock(Long idProducto) {
         ProductoDTO productoDTO = productoAPI.getProducto(idProducto);
-        if(productoDTO==null) throw new ProductoNoEncontradoException();
+        if(productoDTO==null) throw new ProductoNoEncontradoException(idProducto);
         Stock stock=stockRepository.getProductStock(idProducto);
-        if(stock==null) throw new StockNoRegistradoException();
+        if(stock==null) throw new StockNoRegistradoException(idProducto);
         return stock;
     }
 

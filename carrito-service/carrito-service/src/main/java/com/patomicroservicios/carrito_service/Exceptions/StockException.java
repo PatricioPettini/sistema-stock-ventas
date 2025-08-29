@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class StockException extends RuntimeException{
-    public StockException() {
-        super("No hay suficiente Stock!");
+    public StockException(Long idProducto) {
+        super("No hay suficiente Stock del proiducto " + idProducto);
     }
 }

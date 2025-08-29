@@ -1,7 +1,5 @@
 package com.patomicroservicios.productos_service.dto.request;
 
-import com.patomicroservicios.productos_service.dto.response.MarcaDTO;
-import com.patomicroservicios.productos_service.dto.response.TipoProductoDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -22,7 +20,7 @@ public class ProductCreateDTO {
     private Long idMarca;
 
     @NotNull(message = "Product type ID cannot be null")
-    private Long idTipoProducto;
+    private Long idCategoria;
 
     @Positive(message = "Price must be greater than zero")
     private double precioIndividual;

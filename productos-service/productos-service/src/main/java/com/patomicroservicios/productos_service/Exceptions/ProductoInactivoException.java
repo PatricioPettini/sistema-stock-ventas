@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.CONFLICT)
 public class ProductoInactivoException extends RuntimeException{
-    public ProductoInactivoException() {
-        super("El producto ya se encuentra inactivo!");
+    public ProductoInactivoException(Long id) {
+        super("El producto" + id + "ya se encuentra inactivo!");
     }
 }

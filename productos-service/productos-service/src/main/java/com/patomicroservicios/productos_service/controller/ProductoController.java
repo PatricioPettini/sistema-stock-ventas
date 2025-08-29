@@ -43,7 +43,7 @@ public class ProductoController {
     @GetMapping("/filter")
     public ResponseEntity<List<ProductoDTO>> getProductosFiltrados(
             @RequestBody ProductFilterDTO dto) {
-        return ResponseEntity.ok(productoService.filter(dto.getIdMarca(), dto.getIdTipoProducto(), dto.getEstado()));
+        return ResponseEntity.ok(productoService.filter(dto.getIdMarca(), dto.getIdCategoria(), dto.getEstado()));
     }
 
     @GetMapping("/order/precio/{ascendente}")

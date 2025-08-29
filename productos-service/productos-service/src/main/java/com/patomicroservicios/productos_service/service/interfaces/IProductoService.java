@@ -17,7 +17,7 @@ public interface IProductoService {
     ProductoDTO patchProduct(Long codigo, ProductPatchDTO prod);
     ProductoDTO inactivarProducto(Long id);
     ProductoDTO ActivarProducto(Long id);
-    List<ProductoDTO> filter(Long idMarca, Long idTipoProducto, Boolean estado);
+    List<ProductoDTO> filter(Long idMarca, Long idCategoria, Boolean estado);
     List<ProductoDTO> orderByPrecio(Boolean ascendente);
 //    List<ProductoDTO> getProductsById(List<Long> ids);
 }

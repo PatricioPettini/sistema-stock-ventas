@@ -6,8 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
@@ -23,6 +26,11 @@ public class Stock {
     @NotNull(message = "No puede estar vacio")
     @Column(nullable = false)
     private int cantidad;
-    @Temporal(TemporalType.DATE)
-    private LocalDate fechaActualizacion;
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime creadoEn;
+
+    @UpdateTimestamp
+    private LocalDateTime actualizadoEn;
+
 }

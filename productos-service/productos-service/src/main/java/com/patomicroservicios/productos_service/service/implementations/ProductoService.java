@@ -1,21 +1,17 @@
 package com.patomicroservicios.productos_service.service.implementations;
 
-import com.patomicroservicios.productos_service.Exceptions.ProductoActivoException;
-import com.patomicroservicios.productos_service.Exceptions.ProductoInactivoException;
 import com.patomicroservicios.productos_service.Exceptions.ProductoNoEncontradoException;
 import com.patomicroservicios.productos_service.dto.request.ProductCreateDTO;
 import com.patomicroservicios.productos_service.dto.request.ProductPatchDTO;
 import com.patomicroservicios.productos_service.dto.request.ProductoUpdateDTO;
-import com.patomicroservicios.productos_service.dto.response.MarcaDTO;
 import com.patomicroservicios.productos_service.dto.response.ProductoDTO;
-import com.patomicroservicios.productos_service.dto.response.TipoProductoDTO;
 import com.patomicroservicios.productos_service.model.Marca;
 import com.patomicroservicios.productos_service.model.Producto;
-import com.patomicroservicios.productos_service.model.TipoProducto;
+import com.patomicroservicios.productos_service.model.Categoria;
 import com.patomicroservicios.productos_service.repository.IProductoRepository;
 import com.patomicroservicios.productos_service.service.interfaces.IMarcaService;
 import com.patomicroservicios.productos_service.service.interfaces.IProductoService;
-import com.patomicroservicios.productos_service.service.interfaces.ITipoProductoService;
+import com.patomicroservicios.productos_service.service.interfaces.ICategoriaService;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +19,7 @@ import org.springframework.stereotype.Service;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +31,7 @@ public class ProductoService implements IProductoService {
     IProductoRepository productoRepository;
 
     @Autowired
-    ITipoProductoService tipoProductoService;
+    ICategoriaService categoriaService;
 
     @Autowired
     IMarcaService marcaService;
@@ -51,10 +47,12 @@ public class ProductoService implements IProductoService {
         if(idMarca!=null && marcaService.getMarca(idMarca)!=null){
             prod.setMarca(marcaService.getMarca(idMarca));
         }
-        Long idTipoProducto=producto.getIdTipoProducto();
-        if(idTipoProducto!=null && tipoProductoService.getTipoProducto(idTipoProducto)!=null){
-            prod.setTipoProducto(tipoProductoService.getTipoProducto(idTipoProducto));
+        Long idCategoria=producto.getIdCategoria();
+        if(idCategoria!=null && categoriaService.getCategoria(idCategoria)!=null){
+            prod.setCategoria(categoriaService.getCategoria(idCategoria));
         }
+//        prod.setActualizadoEn(LocalDate.now());
+//        prod.setCreadoEn(LocalDate.now());
         Producto guardado=productoRepository.save(prod);
         return modelMapper.map(guardado,ProductoDTO.class);
     }
@@ -80,12 +78,12 @@ public class ProductoService implements IProductoService {
             Marca mar=marcaService.getMarca(idMarca);
             product.setMarca(mar);
         }
-        Long idTipoProducto = producto.getIdTipoProducto();
-        if (idTipoProducto != null) {
-            TipoProducto tipoProducto=tipoProductoService.getTipoProducto(idTipoProducto);
-            product.setTipoProducto(tipoProducto);
+        Long idCategoria = producto.getIdCategoria();
+        if (idCategoria != null) {
+            Categoria categoria=categoriaService.getCategoria(idCategoria);
+            product.setCategoria(categoria);
         }
-
+//        product.setActualizadoEn(LocalDate.now());
         productoRepository.save(product);
 
         return modelMapper.map(producto,ProductoDTO.class);
@@ -117,7 +115,7 @@ public class ProductoService implements IProductoService {
                     ProductoDTO dto = modelMapper.map(producto, ProductoDTO.class);
                     return dto;
                 }
-        ).orElseThrow(ProductoNoEncontradoException::new);
+        ).orElseThrow(()->new ProductoNoEncontradoException(codigoProducto));
     }
 
     //modificar algun campos del producto
@@ -136,11 +134,12 @@ public class ProductoService implements IProductoService {
             Marca mar=marcaService.getMarca(producto.getIdMarca());
             product.setMarca(mar);
         }
-        if(producto.getIdTipoProducto()!=null){
-            TipoProducto tipo=tipoProductoService.getTipoProducto(producto.getIdTipoProducto());
-            product.setTipoProducto(tipo);
+        if(producto.getIdCategoria()!=null){
+            Categoria categoria=categoriaService.getCategoria(producto.getIdCategoria());
+            product.setCategoria(categoria);
         }
         if(producto.getEstado()!=null) product.setEstado(producto.getEstado());
+//        product.setActualizadoEn(LocalDate.now());
         Producto prod = productoRepository.save(product);
         return modelMapper.map(prod,ProductoDTO.class);
     }
@@ -149,6 +148,7 @@ public class ProductoService implements IProductoService {
     public ProductoDTO inactivarProducto(Long id) {
         Producto producto=getProducto(id);
         producto.inactivar();
+//        producto.setActualizadoEn(LocalDate.now());
         productoRepository.save(producto);
         return getProductoDTO(id);
     }
@@ -157,19 +157,20 @@ public class ProductoService implements IProductoService {
     public ProductoDTO ActivarProducto(Long id) {
         Producto producto=getProducto(id);
         producto.activar();
+//        producto.setActualizadoEn(LocalDate.now());
         productoRepository.save(producto);
         return getProductoDTO(id);
     }
 
     @Override
-    public List<ProductoDTO> filter(Long idMarca, Long idTipoProducto, Boolean estado) {
+    public List<ProductoDTO> filter(Long idMarca, Long idCategoria, Boolean estado) {
         Long marca = (idMarca != null && idMarca > 0) ? idMarca : null;
-        Long tipo  = (idTipoProducto != null && idTipoProducto > 0) ? idTipoProducto : null;
+        Long categoria  = (idCategoria != null && idCategoria > 0) ? idCategoria : null;
         Boolean estadoProducto = estado!=null && estado.equals(true);
         return getAllDto().stream()
                 .filter(p ->
                         (estado == null || p.getEstado().equals(estadoProducto)) &&
-                                (tipo   == null || p.getTipo().getId().equals(tipo)) &&
+                                (categoria   == null || p.getCategoria().getId().equals(categoria)) &&
                                 (marca  == null || p.getMarca().getId().equals(marca))
                 )
                 .collect(Collectors.toList());
@@ -185,7 +186,7 @@ public class ProductoService implements IProductoService {
 
     // obtener producto
     public Producto getProducto(Long codigoProducto){
-        Producto producto=productoRepository.findById(codigoProducto).orElseThrow(ProductoNoEncontradoException::new);
+        Producto producto=productoRepository.findById(codigoProducto).orElseThrow(()->new ProductoNoEncontradoException(codigoProducto));
         return producto;
     }
 

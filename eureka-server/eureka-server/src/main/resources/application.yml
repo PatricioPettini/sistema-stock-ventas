@@ -3,8 +3,9 @@ spring:
     name: eureka-server
   security:
     user:
-      name: eureka
-      password: password
+      name: ${SPRING_SECURITY_USER_NAME}
+      password: ${SPRING_SECURITY_USER_PASSWORD}
+
 
 server:
   port: 8761

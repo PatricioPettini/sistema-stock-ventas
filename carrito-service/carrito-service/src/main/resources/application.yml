@@ -10,26 +10,26 @@ spring:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL8Dialect
   datasource:
-    url: jdbc:mysql://localhost:3306/carrito-service?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: ""
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_ROOT}
+    password: ${DATASOURCE_PASS}
     driver-class-name: com.mysql.cj.jdbc.Driver
   security:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://localhost:8181/realms/microservicios-realm/protocol/openid-connect/certs
+          jwk-set-uri: ${JWK_SET_URI}
     client:
       registration:
         keycloak:
-          client-id: microservicios-client          # <-- el ID de tu cliente en Keycloak
-          client-secret: 4T8x8YNNHGOBKeG4Su645BEUWWttEOb0
+          client-id: ${CLIENT_ID}          # <-- el ID de tu cliente en Keycloak
+          client-secret: ${CLIENT_SECRET}
           scope: openid,profile,email
           authorization-grant-type: authorization_code
           redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
       provider:
         keycloak:
-          issuer-uri: http://localhost:8181/realms/microservicios-realm
+          issuer-uri: ${ISSUES_URI}
 
 server:
   port: 8082
@@ -37,7 +37,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka:password@localhost:8761/eureka
+      defaultZone: ${EUREKA_DEFAULTZONE}
   instance:
     hostname: localhost
     prefer-ip-address: true

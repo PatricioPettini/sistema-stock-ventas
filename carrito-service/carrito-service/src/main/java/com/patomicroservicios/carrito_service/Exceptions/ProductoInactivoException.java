@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class ProductoInactivoException extends RuntimeException{
-    public ProductoInactivoException() {
-        super("El producto no esta activo!");
+    public ProductoInactivoException(Long idProducto) {
+        super("El producto " + idProducto +" no esta activo!");
     }
 }

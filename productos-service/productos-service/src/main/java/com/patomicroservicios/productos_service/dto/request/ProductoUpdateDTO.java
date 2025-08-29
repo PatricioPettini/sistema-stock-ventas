@@ -20,7 +20,7 @@ public class ProductoUpdateDTO {
     private Long idMarca;
 
     @NotNull(message = "Product type ID cannot be null")
-    private Long idTipoProducto;
+    private Long idCategoria;
 
     @Positive(message = "Price must be greater than zero")
     private double precioIndividual;

@@ -1,5 +1,7 @@
 package com.patomicroservicios.productos_service.controller;
 
+import com.patomicroservicios.productos_service.dto.request.MarcaCreateDTO;
+import com.patomicroservicios.productos_service.dto.request.MarcaUpdateDTO;
 import com.patomicroservicios.productos_service.dto.response.MarcaDTO;
 import com.patomicroservicios.productos_service.model.Marca;
 import com.patomicroservicios.productos_service.service.interfaces.IMarcaService;
@@ -29,13 +31,13 @@ public class MarcaController {
     }
 
     @PostMapping("/post")
-    public ResponseEntity<MarcaDTO> addProduct(@RequestBody Marca marca) {
+    public ResponseEntity<MarcaDTO> addProduct(@RequestBody MarcaCreateDTO marca) {
         MarcaDTO mar=marcaService.addMarca(marca);
         return ResponseEntity.status(HttpStatus.CREATED).body(mar);
     }
 
     @PutMapping("/put/{id}")
-    public ResponseEntity<MarcaDTO> putProduct(@PathVariable Long id, @RequestBody Marca marca) {
+    public ResponseEntity<MarcaDTO> putProduct(@PathVariable Long id, @RequestBody MarcaUpdateDTO marca) {
         MarcaDTO mar=marcaService.updateMarca(id, marca);
         return ResponseEntity.ok(mar);
     }

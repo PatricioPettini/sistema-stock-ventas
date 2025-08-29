@@ -13,3 +13,4 @@ public interface IStockService {
     StockDTO getStockDTO(Long idProducto);
     List<Stock> getAllStock();
 }
+

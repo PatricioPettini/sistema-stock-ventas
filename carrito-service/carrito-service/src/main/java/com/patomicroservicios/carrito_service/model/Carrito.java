@@ -7,7 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -22,7 +26,14 @@ public class Carrito {
     @NotNull(message = "No puede estar vacio")
     @Column(nullable = false)
     private String idUser;
-    private Double totalPrice;
+    private Double precioTotal;
     @ElementCollection(fetch = FetchType.LAZY)
-    private List<ProductoCantidad> productList;
+    private List<ProductoCantidad> listaProductos;
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime creadoEn;
+
+    @UpdateTimestamp
+    private LocalDateTime actualizadoEn;
+
 }

@@ -9,7 +9,7 @@ import lombok.Setter;
 public class ProductPatchDTO {
     private String nombre;          // opcional
     private Long idMarca;           // opcional
-    private Long idTipoProducto;    // opcional
+    private Long idCategoria;    // opcional
     private Double precioIndividual;// opcional
     private Boolean estado;          // opcional (ej: "ACTIVO" / "INACTIVO")
 }

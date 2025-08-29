@@ -1,4 +1,4 @@
-package com.patomicroservicios.carrito_service.dto;
+package com.patomicroservicios.stock_service.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TipoProductoDTO {
+public class CategoriaDTO {
     private Long id;
-    private String tipo;
+    private String descripcion;
+    private CategoriaDTO categoriaPadre;
 }
