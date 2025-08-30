@@ -1,14 +1,12 @@
 package com.patomicroservicios.carrito_service.controller;
 
-import com.patomicroservicios.carrito_service.dto.ProductoDTO;
 import com.patomicroservicios.carrito_service.dto.request.CarritoProductsDTO;
-import com.patomicroservicios.carrito_service.dto.CarritoDTO;
+import com.patomicroservicios.carrito_service.dto.response.CarritoDTO;
 import com.patomicroservicios.carrito_service.dto.request.CarritoProductsDeleteDTO;
 import com.patomicroservicios.carrito_service.model.Carrito;
 import com.patomicroservicios.carrito_service.service.ICarritoService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +33,7 @@ public class CarritoContoller {
             description= "Este endpoint permite obtener todos los carritos"
     )
     @GetMapping("/get/all")
-    public List<Carrito> getAllCarritos(){
+    public List<CarritoDTO> getAllCarritos(){
         return carritoService.getAllCarritos();
     }
 
@@ -54,8 +52,8 @@ public class CarritoContoller {
             description= "Este endpoint permite agregar productos a un carrito"
     )
     @PostMapping("/add/producto")
-    public ResponseEntity<Carrito> addProductosCarrito(@RequestBody CarritoProductsDTO dto){
-        Carrito carrito=carritoService.agregarProducto(dto.getIdCarrito(),dto.getIdProducto(), dto.getCantidad());
+    public ResponseEntity<CarritoDTO> addProductosCarrito(@RequestBody CarritoProductsDTO dto){
+        CarritoDTO carrito=carritoService.agregarProducto(dto.getIdCarrito(),dto.getIdProducto(), dto.getCantidad());
         return ResponseEntity.ok(carrito);
     }
 
@@ -64,8 +62,8 @@ public class CarritoContoller {
             description= "Este endpoint permite obtener un carrito en base a su id"
     )
     @PutMapping("/put/producto")
-    public ResponseEntity<Carrito> editarCantidadProductoCarrito(@RequestBody CarritoProductsDTO dto){
-        Carrito carrito=carritoService.editarCantidadProducto(dto.getIdCarrito(), dto.getIdProducto(),dto.getCantidad());
+    public ResponseEntity<CarritoDTO> editarCantidadProductoCarrito(@RequestBody CarritoProductsDTO dto){
+        CarritoDTO carrito=carritoService.editarCantidadProducto(dto.getIdCarrito(), dto.getIdProducto(),dto.getCantidad());
         return ResponseEntity.ok(carrito);
     }
 

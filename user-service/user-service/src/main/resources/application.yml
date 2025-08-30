@@ -16,32 +16,29 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          # Opción A (la que ya usas):
-          jwk-set-uri: http://localhost:8181/realms/microservicios-realm/protocol/openid-connect/certs
-          # Opción B (en vez de la anterior):
-          # issuer-uri: http://localhost:8181/realms/microservicios-realm
+          jwk-set-uri: ${JWK_SET_URI}
 
       client:
         registration:
           keycloak:
-            client-id: microservicios-client          # <-- el ID de tu cliente en Keycloak
-            client-secret: 4T8x8YNNHGOBKeG4Su645BEUWWttEOb0
+            client-id: ${CLIENT_ID}          # <-- el ID de tu cliente en Keycloak
+            client-secret: ${CLIENT_SECRET}
             scope: openid,profile,email
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
         provider:
           keycloak:
-            issuer-uri: http://localhost:8181/realms/microservicios-realm
+            issuer-uri: ${ISSUER_URL}
 
 keycloak:
-  server-url: http://localhost:8181         # o 8080 si ese es tu KC
-  realm: microservicios-realm
+  server-url: ${SERVER_URL}         # o 8080 si ese es tu KC
+  realm: ${REALM}
   admin:
-    client-id: microservicios-client        # <-- debe ser un client CONFIDENTIAL con Service Accounts = ON
-    client-secret: 4T8x8YNNHGOBKeG4Su645BEUWWttEOb0        # <-- secret de ese client
+    client-id: ${CLIENT_ID}         # <-- debe ser un client CONFIDENTIAL con Service Accounts = ON
+    client-secret: ${CLIENT_SECRET}       # <-- secret de ese client
   login:
-    client-id: microservicios-client       # el client para login (puede ser el mismo u otro)
-    client-secret: 4T8x8YNNHGOBKeG4Su645BEUWWttEOb0  # dejar vacío si el client es Public
+    client-id: ${CLIENT_ID}       # el client para login (puede ser el mismo u otro)
+    client-secret: ${CLIENT_SECRET}  # dejar vacío si el client es Public
     confidential: true                       # true si tu client requiere secret (Confidential)
   legacy-auth-path: false                   # true solo si tu KC usa /auth (Keycloak viejo)
 
@@ -51,18 +48,9 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka:password@localhost:8761/eureka
+      defaultZone: ${DEFAULT_ZONE}
   instance:
     hostname: localhost
     prefer-ip-address: true
     ip-address: 127.0.0.1
     instance-id: ${spring.application.name}:${server.port}
-
-springdoc:
-  api-docs:
-    enabled: true
-    path: /user-service/v3/api-docs
-  swagger-ui:
-    enabled: true
-    path: /user-service/swagger-ui.html
-    config-url: /user-service/v3/api-docs/swagger-config

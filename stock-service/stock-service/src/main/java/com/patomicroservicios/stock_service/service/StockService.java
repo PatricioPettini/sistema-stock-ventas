@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StockService implements IStockService{
@@ -46,29 +47,31 @@ public class StockService implements IStockService{
     @Override
     public StockDTO editStock(Long idProducto, int nuevaCantidad) {
         if (nuevaCantidad < 0) throw new IllegalArgumentException("Cantidad negativa");
-        Stock stock=getStock(idProducto);
-        stock.setCantidad(nuevaCantidad);
+        StockDTO stockDto=getStock(idProducto);
+        stockDto.setCantidad(nuevaCantidad);
 //        stock.setFechaActualizacion(LocalDate.now());
-        return modelMapper.map(stockRepository.save(stock),StockDTO.class);
+        Stock st=modelMapper.map(stockDto,Stock.class);
+        return toDto(stockRepository.save(st));
     }
 
     //obtener el stock de un producto determinado
     @Override
-    public Stock getStock(Long idProducto) {
+    public StockDTO getStock(Long idProducto) {
         ProductoDTO productoDTO = productoAPI.getProducto(idProducto);
         if(productoDTO==null) throw new ProductoNoEncontradoException(idProducto);
         Stock stock=stockRepository.getProductStock(idProducto);
         if(stock==null) throw new StockNoRegistradoException(idProducto);
-        return stock;
+        return toDto(stock);
+    }
+
+    public StockDTO toDto(Stock stock){
+        return modelMapper.map(stock,StockDTO.class);
     }
 
     @Override
-    public StockDTO getStockDTO(Long idProducto) {
-        return modelMapper.map(getStock(idProducto),StockDTO.class);
-    }
-
-    @Override
-    public List<Stock> getAllStock() {
-        return stockRepository.findAll();
+    public List<StockDTO> getAllStock() {
+        return stockRepository.findAll().stream()
+                .map(this::toDto)   // acá usamos ModelMapper
+                .collect(Collectors.toList());
     }
 }

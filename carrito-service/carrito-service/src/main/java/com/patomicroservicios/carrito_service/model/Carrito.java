@@ -26,6 +26,7 @@ public class Carrito {
     @NotNull(message = "No puede estar vacio")
     @Column(nullable = false)
     private String idUser;
+    @Column(nullable = true)
     private Double precioTotal;
     @ElementCollection(fetch = FetchType.LAZY)
     private List<ProductoCantidad> listaProductos;

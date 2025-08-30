@@ -4,6 +4,8 @@ import com.patomicroservicios.productos_service.Exceptions.ProductoNoEncontradoE
 import com.patomicroservicios.productos_service.dto.request.ProductCreateDTO;
 import com.patomicroservicios.productos_service.dto.request.ProductPatchDTO;
 import com.patomicroservicios.productos_service.dto.request.ProductoUpdateDTO;
+import com.patomicroservicios.productos_service.dto.response.CategoriaDTO;
+import com.patomicroservicios.productos_service.dto.response.MarcaDTO;
 import com.patomicroservicios.productos_service.dto.response.ProductoDTO;
 import com.patomicroservicios.productos_service.model.Marca;
 import com.patomicroservicios.productos_service.model.Producto;
@@ -44,12 +46,14 @@ public class ProductoService implements IProductoService {
     public ProductoDTO altaProducto(ProductCreateDTO producto) {
         Producto prod=modelMapper.map(producto,Producto.class);
         Long idMarca=producto.getIdMarca();
-        if(idMarca!=null && marcaService.getMarca(idMarca)!=null){
-            prod.setMarca(marcaService.getMarca(idMarca));
+        MarcaDTO marca=marcaService.getMarcaDTO(idMarca);
+        if(idMarca!=null && marca!=null){
+            prod.setMarca(marcaService.toModel(marca));
         }
         Long idCategoria=producto.getIdCategoria();
-        if(idCategoria!=null && categoriaService.getCategoria(idCategoria)!=null){
-            prod.setCategoria(categoriaService.getCategoria(idCategoria));
+        CategoriaDTO categoriaDTO=categoriaService.getCategoriaDTO(idCategoria);
+        if(idCategoria!=null && categoriaDTO!=null){
+            prod.setCategoria(categoriaService.toModel(categoriaDTO));
         }
 //        prod.setActualizadoEn(LocalDate.now());
 //        prod.setCreadoEn(LocalDate.now());
@@ -75,12 +79,12 @@ public class ProductoService implements IProductoService {
 
         Long idMarca=producto.getIdMarca();
         if (idMarca != null) {
-            Marca mar=marcaService.getMarca(idMarca);
+            Marca mar=marcaService.toModel(marcaService.getMarcaDTO(idMarca));
             product.setMarca(mar);
         }
         Long idCategoria = producto.getIdCategoria();
         if (idCategoria != null) {
-            Categoria categoria=categoriaService.getCategoria(idCategoria);
+            Categoria categoria=categoriaService.toModel(categoriaService.getCategoriaDTO(idCategoria));
             product.setCategoria(categoria);
         }
 //        product.setActualizadoEn(LocalDate.now());
@@ -102,6 +106,10 @@ public class ProductoService implements IProductoService {
 
     private ProductoDTO toDto(Producto producto) {
         return modelMapper.map(producto, ProductoDTO.class);
+    }
+
+    public Producto toModel(ProductoDTO productoDTO){
+        return modelMapper.map(productoDTO,Producto.class);
     }
 
     // obtener productos DTO
@@ -130,12 +138,14 @@ public class ProductoService implements IProductoService {
             }
             product.setPrecioIndividual(precio);
         }
-        if(producto.getIdMarca()!=null){
-            Marca mar=marcaService.getMarca(producto.getIdMarca());
+        Long idMarca=producto.getIdMarca();
+        if(idMarca!=null){
+            Marca mar=marcaService.toModel(marcaService.getMarcaDTO(idMarca));
             product.setMarca(mar);
         }
-        if(producto.getIdCategoria()!=null){
-            Categoria categoria=categoriaService.getCategoria(producto.getIdCategoria());
+        Long idCategoria=producto.getIdCategoria();
+        if(idCategoria!=null){
+            Categoria categoria=categoriaService.toModel(categoriaService.getCategoriaDTO(idCategoria));
             product.setCategoria(categoria);
         }
         if(producto.getEstado()!=null) product.setEstado(producto.getEstado());

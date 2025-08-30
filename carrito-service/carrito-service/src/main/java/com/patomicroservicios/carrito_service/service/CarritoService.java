@@ -4,8 +4,8 @@ import com.patomicroservicios.carrito_service.Exceptions.CarritoNoEncontradoExce
 import com.patomicroservicios.carrito_service.Exceptions.ProductoInactivoException;
 import com.patomicroservicios.carrito_service.Exceptions.ProductoNoEncontradoException;
 import com.patomicroservicios.carrito_service.Exceptions.StockException;
-import com.patomicroservicios.carrito_service.dto.CarritoDTO;
-import com.patomicroservicios.carrito_service.dto.ProductoDTO;
+import com.patomicroservicios.carrito_service.dto.response.CarritoDTO;
+import com.patomicroservicios.carrito_service.dto.response.ProductoDTO;
 import com.patomicroservicios.carrito_service.dto.request.StockPatchDTO;
 import com.patomicroservicios.carrito_service.dto.response.StockDTO;
 import com.patomicroservicios.carrito_service.model.Carrito;
@@ -14,20 +14,14 @@ import com.patomicroservicios.carrito_service.repository.ICarritoRepository;
 import com.patomicroservicios.carrito_service.repository.productoAPI;
 import com.patomicroservicios.carrito_service.repository.stockAPI;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.BadRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -47,7 +41,7 @@ public class CarritoService implements ICarritoService{
 
     //agregar producto al carrito
     @Override
-    public Carrito agregarProducto(Long idCarrito, Long idProducto, int cantidad) {
+    public CarritoDTO agregarProducto(Long idCarrito, Long idProducto, int cantidad) {
         Carrito carrito = carritoRepository.findById(idCarrito).orElseThrow(CarritoNoEncontradoException::new);
         ProductoDTO productoDTO = productoAPI.getProducto(idProducto);
         if (productoDTO == null) throw new ProductoNoEncontradoException(idProducto);
@@ -59,7 +53,8 @@ public class CarritoService implements ICarritoService{
         carrito.getListaProductos().add(productoCantidad);
         actualizarSumaTotal(carrito);
 //        carrito.setActualizadoEn(LocalDate.now());
-        return carritoRepository.save(carrito);
+        Carrito guardado= carritoRepository.save(carrito);
+        return toDto(guardado);
     }
 
     //validar stock disponible
@@ -127,8 +122,10 @@ public class CarritoService implements ICarritoService{
     }
 
     @Override
-    public List<Carrito> getAllCarritos() {
-        return carritoRepository.findAll();
+    public List<CarritoDTO> getAllCarritos() {
+        return carritoRepository.findAll().stream()
+                .map(this::toDto)   // acá usamos ModelMapper
+                .collect(Collectors.toList());
     }
 
     //crear nuevo carrito
@@ -157,7 +154,7 @@ public class CarritoService implements ICarritoService{
         carritoRepository.save(carrito);
     }
     @Override
-    public Carrito editarCantidadProducto(Long idCarrito, Long idProducto, int cantidad) {
+    public CarritoDTO editarCantidadProducto(Long idCarrito, Long idProducto, int cantidad) {
         Carrito carrito=carritoRepository.findById(idCarrito).orElseThrow(CarritoNoEncontradoException::new);
         ProductoDTO productoDTO=productoAPI.getProducto(idProducto);
         if(productoDTO==null) throw new ProductoNoEncontradoException(idProducto);
@@ -182,7 +179,12 @@ public class CarritoService implements ICarritoService{
         carrito.setListaProductos(productoCantidadList);
 //        carrito.setActualizadoEn(LocalDate.now());
         actualizarSumaTotal(carrito);
-        return carritoRepository.save(carrito);
+        Carrito guardado=carritoRepository.save(carrito);
+        return toDto(guardado);
+    }
+
+    private CarritoDTO toDto(Carrito carrito) {
+        return modelMapper.map(carrito, CarritoDTO.class);
     }
 
 }

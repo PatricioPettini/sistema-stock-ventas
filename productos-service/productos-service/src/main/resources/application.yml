@@ -60,12 +60,3 @@ eureka:
     prefer-ip-address: true
     ip-address: 127.0.0.1
     instance-id: ${spring.application.name}:${server.port}
-
-springdoc:
-  api-docs:
-    enabled: true
-    path: /productos-service/v3/api-docs
-  swagger-ui:
-    enabled: true
-    path: /productos-service/swagger-ui.html
-    config-url: /productos-service/v3/api-docs/swagger-config

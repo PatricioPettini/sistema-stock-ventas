@@ -8,10 +8,10 @@ import com.patomicroservicios.productos_service.model.Marca;
 import java.util.List;
 
 public interface IMarcaService {
-    Marca getMarca(Long id);
     MarcaDTO getMarcaDTO(Long id);
-    List<Marca> getAll();
+    List<MarcaDTO> getAll();
     MarcaDTO addMarca(MarcaCreateDTO marca);
     void deleteMarca(Long id);
     MarcaDTO updateMarca(Long id, MarcaUpdateDTO marca);
+    Marca toModel(MarcaDTO marcaDto);
 }

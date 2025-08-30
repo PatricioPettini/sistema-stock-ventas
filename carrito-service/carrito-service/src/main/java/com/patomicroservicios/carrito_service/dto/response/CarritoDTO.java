@@ -1,4 +1,4 @@
-package com.patomicroservicios.carrito_service.dto;
+package com.patomicroservicios.carrito_service.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 public class CarritoDTO {
     private Long id;
-    private double totalPrice;
+    private Double totalPrice;
     private List<ProductoDTO> productList;
 }

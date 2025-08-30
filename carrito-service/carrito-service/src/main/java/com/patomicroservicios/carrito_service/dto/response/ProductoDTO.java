@@ -1,4 +1,4 @@
-package com.patomicroservicios.carrito_service.dto;
+package com.patomicroservicios.carrito_service.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: api-gateway-pato
+  main:
+    web-application-type: reactive
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${ISSUER_URI}
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      default-filters:
+        - SaveSession
+      routes:
+        - id: eureka-ui
+          uri: ${URI}
+          predicates:
+            - Path=/eureka/**
+          filters:
+            - name: RewritePath
+              args:
+                regexp: "/eureka/(?<segment>.*)"
+                replacement: "/${segment}"
+
+server:
+  port: 8090   # mejor usar 8080 si no configuraste SSL para 443
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${DEFAULT_ZONE}
+
+logging:
+  level:
+    root: info
+    org.springframework.cloud.gateway: trace

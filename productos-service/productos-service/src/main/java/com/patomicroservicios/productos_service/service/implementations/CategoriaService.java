@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class CategoriaService implements ICategoriaService {
 
@@ -23,23 +25,29 @@ public class CategoriaService implements ICategoriaService {
     @Autowired
     ModelMapper modelMapper;
 
-    @Override
-    public Categoria getCategoria(Long id) {
-        return categoriaRepository.findById(id).orElseThrow(()->new CategoriaNoEncontradaException(id));
-    }
-
     public CategoriaDTO getCategoriaDTO(Long id){
-        return modelMapper.map(getCategoria(id), CategoriaDTO.class);
+        Categoria categoria=categoriaRepository.findById(id).orElseThrow(()->new CategoriaNoEncontradaException(id));
+        return toDto(categoria);
     }
 
     @Override
-    public List<Categoria> getAll() {
-        return categoriaRepository.findAll();
+    public List<CategoriaDTO> getAll() {
+        return categoriaRepository.findAll().stream()
+                .map(this::toDto)   // acá usamos ModelMapper
+                .collect(Collectors.toList());
+    }
+
+    public CategoriaDTO toDto(Categoria categoria){
+        return modelMapper.map(categoria,CategoriaDTO.class);
+    }
+
+    public Categoria toModel(CategoriaDTO categoriaDTO){
+        return modelMapper.map(categoriaDTO,Categoria.class);
     }
 
     @Override
     public void delete(Long id) {
-        Categoria cat=getCategoria(id);
+        Categoria cat=toModel(getCategoriaDTO(id));
         categoriaRepository.deleteById(cat.getId());
     }
 
@@ -53,7 +61,7 @@ public class CategoriaService implements ICategoriaService {
         categoria= new Categoria();
         if(categoriaCreateDTO.getCategoriaPadre()!=null){
             Long idCategoriaPadre=categoriaCreateDTO.getCategoriaPadre().getId();
-            Categoria cat=getCategoria(idCategoriaPadre);
+            Categoria cat=toModel(getCategoriaDTO(idCategoriaPadre));
             categoria.setCategoriaPadre(cat);
         }
         categoria.setDescripcion(nombre);
@@ -67,11 +75,11 @@ public class CategoriaService implements ICategoriaService {
 
     @Override
     public CategoriaDTO update(Long id, CategoriaUpdateDTO categoria) {
-        Categoria cat=getCategoria(id);
+        Categoria cat=toModel(getCategoriaDTO(id));
         cat.setDescripcion(categoria.getDescripcion());
         if(categoria.getCategoriaPadre()!=null){
             Long idCategoriaPadre=categoria.getCategoriaPadre().getId();
-            Categoria cate=getCategoria(idCategoriaPadre);
+            Categoria cate=toModel(getCategoriaDTO(idCategoriaPadre));
             cat.setCategoriaPadre(cate);
         }
 //      cat.setActualizadoEn(LocalDate.now());

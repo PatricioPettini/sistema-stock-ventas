@@ -9,8 +9,7 @@ import java.util.List;
 public interface IStockService {
     StockDTO addStock(StockCreateDTO stock);
     StockDTO editStock(Long idProducto, int cantidad);
-    Stock getStock(Long idProducto);
-    StockDTO getStockDTO(Long idProducto);
-    List<Stock> getAllStock();
+    StockDTO getStock(Long idProducto);
+    List<StockDTO> getAllStock();
 }
 

@@ -25,8 +25,8 @@ public class MarcaController {
     }
 
     @GetMapping("/get/all")
-    public ResponseEntity<List<Marca>> getAll() {
-        List<Marca> marcas = marcaService.getAll();
+    public ResponseEntity<List<MarcaDTO>> getAll() {
+        List<MarcaDTO> marcas = marcaService.getAll();
         return ResponseEntity.ok(marcas);
     }
 

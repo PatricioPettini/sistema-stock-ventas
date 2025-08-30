@@ -12,6 +12,7 @@ public class StockServiceApplication {
 
 	public static void main(String[] args) {
 		System.out.println("JWK_SET_URI env: " + System.getenv("JWK_SET_URI"));
+		System.out.println(System.getenv("ISSUER_URI"));
 		SpringApplication.run(StockServiceApplication.class, args);
 	}
 

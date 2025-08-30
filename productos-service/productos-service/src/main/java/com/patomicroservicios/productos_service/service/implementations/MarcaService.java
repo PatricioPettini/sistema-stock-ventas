@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MarcaService implements IMarcaService {
@@ -24,17 +25,24 @@ public class MarcaService implements IMarcaService {
     ModelMapper modelMapper;
 
     @Override
-    public Marca getMarca(Long id) {
-        return marcaRepository.findById(id).orElseThrow(() -> new MarcaNoEncontradaException(id));
-    }
-
-    public MarcaDTO getMarcaDTO(Long id){
-        return modelMapper.map(getMarca(id),MarcaDTO.class);
+    public MarcaDTO getMarcaDTO(Long id) {
+        Marca marca= marcaRepository.findById(id).orElseThrow(() -> new MarcaNoEncontradaException(id));
+        return toDto(marca);
     }
 
     @Override
-    public List<Marca> getAll() {
-        return marcaRepository.findAll();
+    public List<MarcaDTO> getAll() {
+        return marcaRepository.findAll().stream()
+                .map(this::toDto)   // acá usamos ModelMapper
+                .collect(Collectors.toList());
+    }
+
+    public MarcaDTO toDto(Marca marca){
+        return modelMapper.map(marca,MarcaDTO.class);
+    }
+
+    public Marca toModel(MarcaDTO marcaDto){
+        return modelMapper.map(marcaDto,Marca.class);
     }
 
     @Override
@@ -54,13 +62,13 @@ public class MarcaService implements IMarcaService {
 
     @Override
     public void deleteMarca(Long id) {
-        Marca marca=getMarca(id);
+        Marca marca=toModel(getMarcaDTO(id));
         marcaRepository.deleteById(id);
     }
 
     @Override
     public MarcaDTO updateMarca(Long id, MarcaUpdateDTO marca) {
-        Marca mar=getMarca(id);
+        Marca mar=toModel(getMarcaDTO(id));
         mar.setDescripcion(marca.getDescripcion());
 //        mar.setActualizadoEn(LocalDate.now());
         Marca marca1=marcaRepository.save(mar);

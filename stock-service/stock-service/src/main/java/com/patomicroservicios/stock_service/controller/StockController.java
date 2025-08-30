@@ -35,9 +35,9 @@ public class StockController {
             description= "Este endpoint permite obtener el stock de todos los productos registrados"
     )
     @GetMapping("/get/all")
-    public ResponseEntity<List<Stock>> getStockList() {
-        List<Stock> stocks = stockService.getAllStock();
-        return ResponseEntity.ok(stocks);
+    public ResponseEntity<List<StockDTO>> getStockList() {
+        List<StockDTO> listaStock = stockService.getAllStock();
+        return ResponseEntity.ok(listaStock);
     }
 
     @Operation(
@@ -46,7 +46,7 @@ public class StockController {
     )
     @GetMapping("/get/{productId}")
     public ResponseEntity<StockDTO> getStock(@PathVariable Long productId) {
-        StockDTO stock = stockService.getStockDTO(productId);
+        StockDTO stock = stockService.getStock(productId);
         return ResponseEntity.ok(stock);
     }
 
